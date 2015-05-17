@@ -28,6 +28,11 @@ byday[, .(mean=mean(totalsteps, na.rm=T), median=median(totalsteps, na.rm=T))]
 
 
 ## What is the average daily activity pattern?
+```{r average pattern}
+avgpattern <- data[, .(meansteps=mean(steps, na.rm=T)), by = interval]
+plot(avgpattern$interval, avgpattern$meansteps, type = "l")
+avgpattern[meansteps==max(avgpattern$meansteps),]
+```
 
 
 
