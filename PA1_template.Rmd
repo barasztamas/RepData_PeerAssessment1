@@ -1,8 +1,8 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
 output: 
-  html_document:
-    keep_md: true
+html_document:
+keep_md: true
 ---
 
 
@@ -19,25 +19,48 @@ data$date<-ymd(data$date)
 ## What is mean total number of steps taken per day?
 
 ```{r steps per day}
-byday<- data[, sum(steps), by=date]
-setnames(byday, "V1", "totalsteps")
-hist(byday$totalsteps)
-byday[, .(mean=mean(totalsteps, na.rm=T), median=median(totalsteps, na.rm=T))]
+calcandshowbyday <- function(data) {
+    byday<- data[, sum(steps), by=date]
+    setnames(byday, "V1", "totalsteps")
+    hist(byday$totalsteps, breaks=10)
+    byday[, .(mean=mean(totalsteps, na.rm=T), median=median(totalsteps, na.rm=T))]
+} 
+calcandshowbyday(data)
 
 ```
 
 
 ## What is the average daily activity pattern?
-```{r average pattern}
+
+```{r daily pattern}
 avgpattern <- data[, .(meansteps=mean(steps, na.rm=T)), by = interval]
 plot(avgpattern$interval, avgpattern$meansteps, type = "l")
 avgpattern[meansteps==max(avgpattern$meansteps),]
 ```
 
 
-
 ## Imputing missing values
 
+```{r count missing values}
+sum(!complete.cases(data))
+```
+
+Missing values will be filled with the average value for that interval  
+calcandshowbyday function will be used to show histogram, mean and median the same way as without imputation
+
+```{r imputing missing values}
+datawithavg <- merge(data, avgpattern, by="interval")
+dataimputed<-datawithavg[, .(
+        date
+        , interval
+        , steps=ifelse(is.na(steps), meansteps, steps)
+    )
+]
+calcandshowbyday(dataimputed)
+
+```
+The histogram has only changed "in the middle", its highest cell became even higher. The mean of days hasn't changed, the median of days became equal to the mean.  
+All of these changes are caused by the fact that data for whole days was missing only, and we replaced those days with average data of other days
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
