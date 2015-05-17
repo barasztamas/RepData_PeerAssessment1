@@ -33,7 +33,11 @@ calcandshowbyday(data)
 ## What is the average daily activity pattern?
 
 ```{r daily pattern}
+plotpattern <- function(avgpattern, title) {
+    plot(avgpattern$interval, avgpattern$meansteps, type = "l")
+}
 avgpattern <- data[, .(meansteps=mean(steps, na.rm=T)), by = interval]
+plotpattern(avgpattern)
 plot(avgpattern$interval, avgpattern$meansteps, type = "l")
 avgpattern[meansteps==max(avgpattern$meansteps),]
 ```
@@ -64,3 +68,13 @@ All of these changes are caused by the fact that data for whole days was missing
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+```{r weekdays vs weekends}
+data$week<-data[,as.factor(ifelse(substr(weekdays(date, T), 1, 1) !="S", "weekday", "weekend"))]
+par(mfrow=c(2,1))
+plotpattern(data[week=="weekday", .(meansteps=mean(steps, na.rm=T)), by = interval])
+title ("weekday")
+plotpattern(data[week=="weekend", .(meansteps=mean(steps, na.rm=T)), by = interval])
+title ("weekend")
+```
+
