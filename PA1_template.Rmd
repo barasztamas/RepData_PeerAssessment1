@@ -38,8 +38,7 @@ plotpattern <- function(avgpattern, title) {
 }
 avgpattern <- data[, .(meansteps=mean(steps, na.rm=T)), by = interval]
 plotpattern(avgpattern)
-plot(avgpattern$interval, avgpattern$meansteps, type = "l")
-avgpattern[meansteps==max(avgpattern$meansteps),]
+avgpattern[which.max(avgpattern$meansteps),]
 ```
 
 
